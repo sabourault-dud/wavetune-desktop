@@ -4,11 +4,53 @@ const path = require('path');
 const fs   = require('fs');
 const os   = require('os');
 const { execFile } = require('child_process');
+const { autoUpdater } = require('electron-updater');
 
 const AUDIO = new Set(['.mp3','.m4a','.aac','.flac','.wav','.ogg','.opus','.wma','.aiff','.alac']);
 const VIDEO = new Set(['.mp4','.m4v','.mov','.avi','.mkv','.wmv','.mpg','.mpeg','.webm']);
 
 let win = null;
+// ════════════════════════════════════════════════════════════════════
+// AUTO-UPDATER — checks GitHub Releases on launch, prompts on new version
+// ════════════════════════════════════════════════════════════════════
+function setupAutoUpdater() {
+  // Pas de check en dev (l'app n'est pas packagée)
+  if (!app.isPackaged) return;
+
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('error', (err) => {
+    console.warn('[updater] error:', err?.message || err);
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('[updater] update available:', info.version);
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('[updater] up to date');
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('[updater] downloaded:', info.version);
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: ['Redémarrer maintenant', 'Plus tard'],
+      defaultId: 0,
+      title: 'Mise à jour disponible',
+      message: `Wave Tune ${info.version} est prêt à être installé.`,
+      detail: 'Redémarre maintenant pour appliquer la mise à jour.',
+    }).then(result => {
+      if (result.response === 0) autoUpdater.quitAndInstall();
+    });
+  });
+
+  // Vérifie 5 secondes après le démarrage (laisse le temps à l'app de charger)
+  // puis toutes les 4 heures
+  setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 5000);
+  setInterval(() => autoUpdater.checkForUpdatesAndNotify(), 4 * 60 * 60 * 1000);
+}
 const PREFS = path.join(os.homedir(), '.wavetune', 'prefs.json');
 const SCAN_CACHE = path.join(os.homedir(), '.wavetune', 'scan-cache.json');
 
@@ -1888,5 +1930,5 @@ ipcMain.handle('read-audio-file', async (event, filePath) => {
 // 13. BOOT
 // ============================================================
 
-app.whenReady().then(() => { createWin(); app.on('activate', () => { if (!win) createWin(); }); });
+app.whenReady().then(() => { createWin(); app.on('activate', () => { if (!win) createWin(); }); setupAutoUpdater();});
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
