@@ -1,13 +1,14 @@
 {
   "name": "wavetune-desktop",
   "productName": "Wave Tune",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Wave Tune Desktop — Lecteur + Sync iPhone",
   "author": "Wave Tune",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "build:mac": "electron-builder --mac",
+    "release:mac": "electron-builder --mac --publish always",
     "build:win": "electron-builder --win",
     "build:linux": "electron-builder --linux"
   },
