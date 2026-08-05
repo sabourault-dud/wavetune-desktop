@@ -1,7 +1,7 @@
 {
   "name": "wavetune-desktop",
   "productName": "Wave Tune",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Wave Tune Desktop — Lecteur + Sync iPhone",
   "author": "Wave Tune",
   "main": "src/main.js",
@@ -39,6 +39,7 @@
     ],
     "mac": {
       "category": "public.app-category.music",
+      "icon": "build/icon.png",
       "identity": null,
       "target": [
         {

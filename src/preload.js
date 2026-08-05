@@ -19,10 +19,14 @@ contextBridge.exposeInMainWorld('wt', {
   applyCoverToMain:   (payload)        => ipcRenderer.invoke('applyCoverToMain', payload),
   applyTrackMetaToMain:(payload)       => ipcRenderer.invoke('applyTrackMetaToMain', payload),
   setFullscreen:     (flag)           => ipcRenderer.invoke('setFullscreen', flag),
-  readAudioFile:      (filePath)       => ipcRenderer.invoke('read-audio-file', filePath),
-  shazamRecognize: (audioData) => ipcRenderer.invoke('shazam-recognize', audioData),
-  // Online metadata fetch (runs in main process — no CSP limits)
+  notifyTrack:       (info)           => ipcRenderer.invoke('notify-track', info),
+ // Online metadata fetch (runs in main process — no CSP limits)
   fetchOnlineMeta:   (albumGroups)    => ipcRenderer.invoke('fetch-online-meta', albumGroups),
+  fetchAlbumTracklist: (artist, album) => ipcRenderer.invoke('fetch-album-tracklist', { artist, album }),
+  getMetaCache:      ()               => ipcRenderer.invoke('get-meta-cache'),
+  debugMbrg:         (q)              => ipcRenderer.invoke('debug-mbrg', q),
+  fetchCoverArt:     (album, artist)  => ipcRenderer.invoke('fetch-cover-art', album, artist),
+  saveNoCover:       (noCoverMap)     => ipcRenderer.invoke('save-no-cover', noCoverMap),
   getArtistOverrides:()               => ipcRenderer.invoke('get-artist-overrides'),
   // Sync server (HTTP léger smartphone)
   syncSetTracks:     (tracks)         => ipcRenderer.invoke('sync-set-tracks', tracks),
@@ -30,6 +34,13 @@ contextBridge.exposeInMainWorld('wt', {
   miniReady:     ()        => ipcRenderer.invoke('miniReady'),
   miniCmd:       (action)  => ipcRenderer.invoke('miniCmd', action),
   resizeMini:    (h)       => ipcRenderer.invoke('resizeMini', h),
+  coverCacheGetIndex: ()           => ipcRenderer.invoke('cover-cache:get-index'),
+  coverCacheStore:    (key, url)   => ipcRenderer.invoke('cover-cache:store', { key, url }),
+  coverCacheClear:    ()           => ipcRenderer.invoke('cover-cache:clear'),
+  coverCacheStats:    ()           => ipcRenderer.invoke('cover-cache:stats'),
+  computeTrackId:  (path)             => ipcRenderer.invoke('compute-track-id', path),
+  syncFindFile:    (meta)             => ipcRenderer.invoke('sync-find-file', meta),
+  setTrackFavorite: (path, isFavorite) => ipcRenderer.invoke('setTrackFavorite', { path, isFavorite }),
   // Events
   on: (ch, cb) => ipcRenderer.on(ch, (_, d) => cb(d)),
 });
